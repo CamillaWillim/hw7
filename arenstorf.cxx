@@ -20,27 +20,26 @@ int main(){
   const double mu=0.012277471;
   const double T=17.065216560157;
   const double N=10000; 
-  double dx;
+  double dx=1e-4;
   const double tol=1e-5,q=0.4;
-  double y[4],y4[4],y5[4],k1[4],k2[4],k3[4],k4[4],k5[4],k6[4],k7[4];
+  double y4[4],y5[4],k1[4],k2[4],k3[4],k4[4],k5[4],k6[4],k7[4];
   y4[0]=0.994;
-  y4[0]=y5[0];
   y4[1]=0;
-  y4[1]=y5[1];
   y4[2]=0;
-  y4[2]=y5[2];
   y4[3]=-2.00158510637908;
-  y4[3]=y5[3];
-  //y[4]=0;
-  //y[5]=0;
   
   for(int i=0;i<N;i++){
+      out << dx << " "<< i*dx << " " <<y4[0]<< " "<<y4[1]<< " " <<y5[0]<< " "<<y5[1]<< endl;
       
-      stepsize(y4,y5,tol,q,dx);
+      y5[0]=y4[0];
+      y5[1]=y4[1];
+      y5[2]=y4[2];
+      y5[3]=y4[3];
+      
       rk4(mu,r,s,y4,k1,k2,k3,k4,k5,k6,k7,dx);
       rk5(mu,r,s,y5,k1,k2,k3,k4,k5,k6,k7,dx);
+      stepsize(y4,y5,tol,q,dx);
       
-      out << i*dx << " " <<y4[0]<< " "<<y4[1]<< " " <<y5[0]<< " "<<y5[1]<< endl;
   }
   out.close();
   return 0;
@@ -51,13 +50,12 @@ int main(){
   void stepsize(double* y4,double* y5, const double tol,const double q, double dx){
       double dy[4];
       double v;
-      for(int i=0;i<4;i++) 
-          dy[i]=y4[i]-y5[i];
+      
+                            
+      v=abs(y4[0]-y5[0]);
       for (int i=0;i<3;i++){
-          if(abs(dy[i+1])<abs(dy[i])){ 
-          v=abs(dy[i]);}
-          else{ 
-          v=abs(dy[i+1]);}
+        if(abs(y4[i+1]-y5[i+1])>v){ 
+        v=abs(y4[i+1]-y5[i+1]);}
       }
       
       dx = q*dx*pow((tol/v),(1.0/5.0));
@@ -81,6 +79,9 @@ int main(){
       y[i]=y[i]+dx*((5179.0/57600.0)*k1[i]+(7571.0/16695.0)*k3[i]+(393.0/640.0)*k4[i]+(-92097.0/339200.0)*k5[i]+(187.0/2100.0)*k6[i]+(1.0/40.0)*k7[i]);
 
   }
+  
+  
+  
  void kwerte1(const double mu,double r, double s,double* y,double* k){
   r=sqrt(pow(y[0]+mu,2)+pow(y[1],2));
   s=sqrt(pow(y[0]-1+mu,2)+pow(y[1],2));
@@ -133,7 +134,7 @@ int main(){
     
     
     for(i=0;i<4;i++)
-    zwischenK[i]=y[i]+dx*((35.0/384.0)*k1[i]+(0)*k2[i]+(500.0/1113.0)*k3[i]+(125.0/192.0)*k4[i]+(-2187.0/6784.0)*k5[i]+(11.0/84.0)*k6[i]);
+    zwischenK[i]=y[i]+dx*((35.0/384.0)*k1[i]+(500.0/1113.0)*k3[i]+(125.0/192.0)*k4[i]+(-2187.0/6784.0)*k5[i]+(11.0/84.0)*k6[i]);
 
     kwerte1(mu,r,s,zwischenK,k7);
   }
